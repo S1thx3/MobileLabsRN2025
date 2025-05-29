@@ -50,14 +50,14 @@ const SectionTitle = styled.Text`
 const featuredGameData = {
   id: 'featured1',
   title: 'Dead by Daylight',
-  imageUrl: 'https://via.placeholder.com/700x440/1a2939/FFFFFF?Text=Dead+by+Daylight', // Заміни на реальне посилання або локальний ресурс
+  imageUrl: 'https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/381210/capsule_616x353.jpg?t=1746584187', // Заміни на реальне посилання або локальний ресурс
 };
 
 const gamesData = [
-  { id: '1', title: 'Grand Theft Auto V', platforms: ['Windows'], currentPrice: '$10', oldPrice: '$20', imageUrl: 'https://via.placeholder.com/300x180/2a3f53/FFFFFF?Text=GTA+V' },
-  { id: '2', title: 'Battlefield 4', platforms: ['Windows'], currentPrice: '$35', imageUrl: 'https://via.placeholder.com/300x180/2a3f53/FFFFFF?Text=Battlefield+4' },
-  { id: '3', title: 'Factorio', platforms: ['Windows', 'Mac'], currentPrice: '$7', imageUrl: 'https://via.placeholder.com/300x180/2a3f53/FFFFFF?Text=Factorio' },
-  { id: '4', title: 'Horizon Zero Dawn', platforms: ['Windows'], currentPrice: '$38', imageUrl: 'https://via.placeholder.com/300x180/2a3f53/FFFFFF?Text=Horizon+ZD' },
+  { id: '1', title: 'Grand Theft Auto V', platforms: ['Windows'], currentPrice: '$10', oldPrice: '$20', imageUrl: 'https://www.notebookcheck-ru.com/fileadmin/Notebooks/News/_nc4/GTA5Logo.jpg' },
+  { id: '2', title: 'Battlefield 4', platforms: ['Windows'], currentPrice: '$35', imageUrl: 'https://gaming-cdn.com/images/products/185/orig/battlefield-4-pc-game-ea-app-cover.jpg?v=1707146102' },
+  { id: '3', title: 'Factorio', platforms: ['Windows', 'Mac'], currentPrice: '$7', imageUrl: 'https://assets.nintendo.com/image/upload/c_fill,w_1200/q_auto:best/f_auto/dpr_2.0/ncom/software/switch/70010000056818/c700b4cc22a81c2099335d83fe379e9cdc6afd190a9985f74ba8f7e589f4ffd2' },
+  { id: '4', title: 'Horizon Zero Dawn', platforms: ['Windows'], currentPrice: '$38', imageUrl: 'https://cdn1.epicgames.com/3328b08ac1c14540aa265a1a85c07839/offer/hzd_wide-2560x1440-bd312be05c49cf339097777c493cb899.jpg' },
   // Додай більше ігор
 ];
 
