@@ -23,7 +23,7 @@
 * Expo Vector Icons (для іконок навігації)
 
 **Головний екран (Новини):**
-![Головний екран]`screenshots/photo_2025-05-29_22-11-59.jpg`
+![Головний екран]`/FirstMobileApp/screenshots/gallery.jpg`
 
 
 **Екран Фотогалереї:**
