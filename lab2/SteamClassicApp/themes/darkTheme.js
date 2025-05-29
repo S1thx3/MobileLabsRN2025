@@ -7,5 +7,5 @@ export const darkTheme = {
   tabBarBackground: '#181818',
   tabBarActive: '#FFFFFF',
   tabBarInactive: '#B3B3B3',
-  // Додай інші кольори з Figma
+
 };
