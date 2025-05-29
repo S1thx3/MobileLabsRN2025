@@ -1,21 +1,24 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, FlatList, Image } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Image } from 'react-native'; // Додали Image
 
+// Оновимо newsData, додавши поле для зображення
 const newsData = [
-  // Приклад даних, можна додати більше
-  { id: '1', title: 'Заголовок новини 1', date: 'Дата новини', shortText: 'Короткий текст новини тут...' },
-  { id: '2', title: 'Заголовок новини 2', date: 'Дата новини', shortText: 'Короткий текст новини тут...' },
-  { id: '3', title: 'Заголовок новини 3', date: 'Дата новини', shortText: 'Короткий текст новини тут...' },
-  { id: '4', title: 'Заголовок новини 4', date: 'Дата новини', shortText: 'Короткий текст новини тут...' },
-  { id: '5', title: 'Заголовок новини 5', date: 'Дата новини', shortText: 'Короткий текст новини тут...' },
-  { id: '6', title: 'Заголовок новини 6', date: 'Дата новини', shortText: 'Короткий текст новини тут...' },
-  { id: '7', title: 'Заголовок новини 7', date: 'Дата новини', shortText: 'Короткий текст новини тут...' },
-  { id: '8', title: 'Заголовок новини 8', date: 'Дата новини', shortText: 'Короткий текст новини тут...' },
+  { id: '1', title: 'Заголовок новини 1', date: 'Дата новини', shortText: 'Короткий текст новини тут...', image: require('../assets/images.png') }, // Шлях до зображення
+  { id: '2', title: 'Заголовок новини 2', date: 'Дата новини', shortText: 'Короткий текст новини тут...', image: require('../assets/images.png') },
+  { id: '3', title: 'Заголовок новини 3', date: 'Дата новини', shortText: 'Короткий текст новини тут...', image: require('../assets/images.png') },
+  // Додай інші новини з відповідними шляхами до зображень
+  // Якщо для якоїсь новини немає зображення, можна залишити null або заглушку
+  { id: '4', title: 'Заголовок новини 4 (без фото)', date: 'Дата новини', shortText: 'Короткий текст новини тут...', image: null },
 ];
 
-const NewsItem = ({ title, date, shortText }) => (
+// Оновимо NewsItem для відображення зображення
+const NewsItem = ({ title, date, shortText, image }) => ( // Додали image в props
   <View style={styles.newsItem}>
-    <View style={styles.imagePlaceholder} />
+    {image ? (
+      <Image source={image} style={styles.newsImage} />
+    ) : (
+      <View style={[styles.newsImage, styles.imagePlaceholder]} /> // Заглушка, якщо немає фото
+    )}
     <View style={styles.newsTextContainer}>
       <Text style={styles.newsTitle}>{title}</Text>
       <Text style={styles.newsDate}>{date}</Text>
@@ -30,7 +33,7 @@ const HomeScreen = () => {
       <Text style={styles.screenTitle}>Новини</Text>
       <FlatList
         data={newsData}
-        renderItem={({ item }) => <NewsItem title={item.title} date={item.date} shortText={item.shortText} />}
+        renderItem={({ item }) => <NewsItem title={item.title} date={item.date} shortText={item.shortText} image={item.image} />} // Передаємо image
         keyExtractor={item => item.id}
         style={styles.list}
       />
@@ -59,16 +62,15 @@ const styles = StyleSheet.create({
     borderBottomColor: '#eee',
     alignItems: 'center',
   },
-  imagePlaceholder: {
-    width: 60,
-    height: 60,
-    backgroundColor: '#ccc', // Колір заглушки
+  newsImage: { // Стилі для зображення новини
+    width: 80,
+    height: 80,
     marginRight: 15,
-    // Можна додати іконку, якщо є
-    // justifyContent: 'center',
-    // alignItems: 'center',
+    borderRadius: 5, // опціонально, для заокруглених кутів
   },
-  // placeholderIcon: { /* Стилі для іконки, якщо використовується */ },
+  imagePlaceholder: { // Стиль для заглушки, якщо немає фото
+    backgroundColor: '#ccc',
+  },
   newsTextContainer: {
     flex: 1,
   },

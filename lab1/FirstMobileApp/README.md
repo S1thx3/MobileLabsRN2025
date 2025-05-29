@@ -23,10 +23,10 @@
 * Expo Vector Icons (для іконок навігації)
 
 **Головний екран (Новини):**
-![Головний екран](screenshots/gallery.jpg)
+![Головний екран](screenshots/home.jpg)
 
 **Екран Фотогалереї:**
-![Екран Фотогалереї](screenshots/photo_2025-05-29_22-20-02.jpg)
+![Екран Фотогалереї](screenshots/gallery.jpg)
 
 **Екран Профілю (Реєстрація):**
 ![Екран Профілю](screenshots/photo_2025-05-29_22-12-00.jpg)
