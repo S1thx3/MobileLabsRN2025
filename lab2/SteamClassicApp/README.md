@@ -1,50 +1,50 @@
-# Welcome to your Expo app 👋
+# Лабораторна робота №2 з дисципліни "Розробка мобільних застосунків"
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+**Виконав:** студент(ка) групи [Твоя група] [Твоє Прізвище, Ім'я, По-батькові]
 
-## Get started
+## Тема роботи
+Стилізація компонентів у React Native, списки, темізація. Відтворення UI мобільного застосунку Steam.
 
-1. Install dependencies
+## Опис функціоналу застосунку "SteamClassicApp"
+У рамках лабораторної роботи було розроблено мобільний застосунок, що імітує основні екрани та функціонал Steam, з такими особливостями:
 
-   ```bash
-   npm install
-   ```
+* **Реалізовано 5 основних екранів:**
+    * **Store (Магазин):** Відображення рекомендованих ігор та списку популярних ігор.
+    * **Community (Спільнота):** Стрічка новин або постів.
+    * **Chat (Чат):** Список чатів користувача.
+    * **Safety (Безпека):** Інформація та налаштування Steam Guard.
+    * **Profile (Профіль):** Інформація про користувача, можливість зміни теми та виходу з системи (симуляція).
+* **Стилізація:** Усі компоненти стилізовані за допомогою бібліотеки `styled-components`.
+* **Темізація:** Реалізовано світлу та темну теми оформлення з можливістю динамічного перемикання на екрані Профілю.
+* **Списки:** Для відображення динамічних списків (ігри, новини, чати) використовується компонент `FlatList`.
+* **Навігація:** Використана нижня навігація (BottomTabNavigator) на базі бібліотеки `React Navigation`.
+* **Компонентний підхід:** Створено перевикористовувані компоненти для карток ігор, постів новин, елементів списку чатів тощо.
 
-2. Start the app
+## Використані технології
+* React Native
+* Expo
+* JavaScript (ES6+)
+* Styled Components
+* React Navigation (`@react-navigation/native`, `@react-navigation/bottom-tabs`)
+* Expo Vector Icons
+Нижче наведено скріншоти реалізованих екранів застосунку.
 
-   ```bash
-   npx expo start
-   ```
+### Магазин (Store)
+![Екран Магазину](assets/images/store.jpg)
 
-In the output, you'll find options to open the app in a
+### Спільнота (Community)
+![Екран Спільноти](assets/images/community.jpg)
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+### Чат (Chat)
+![Екран Чату](assets/images/chat.jpg)
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+### Безпека (Safety / Guard)
+![Екран Безпеки](assets/images/guard.jpg)
 
-## Get a fresh project
+### Профіль (Profile)
 
-When you're ready, run:
+**Темна тема:**
+![Екран Профілю - Темна тема](assets/images/profileDark.jpg)
 
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+**Світла тема:**
+![Екран Профілю - Світла тема](assets/images/profileWhite.jpg)
