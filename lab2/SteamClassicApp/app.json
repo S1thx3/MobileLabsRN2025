@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "SteamAppClone",
-    "slug": "SteamAppClone",
+    "name": "SteamClassicApp",
+    "slug": "SteamClassicApp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "steamappclone",
+    "scheme": "steamclassicapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {

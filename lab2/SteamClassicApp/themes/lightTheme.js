@@ -1,6 +1,5 @@
-import { AppTheme } from './darkTheme'; 
-export const lightTheme: AppTheme = { 
-  name: 'light' as const,
+export const lightTheme = {
+  name: 'light',
   background: '#F0F0F0',
   text: '#121212',
   primary: '#1DB954',
@@ -8,5 +7,5 @@ export const lightTheme: AppTheme = {
   tabBarBackground: '#FFFFFF',
   tabBarActive: '#1DB954',
   tabBarInactive: '#757575',
-
+  // Додай інші кольори з Figma
 };
