@@ -1,5 +1,5 @@
-// contexts/ThemeContext.js
-import React, { createContext, useState, useMemo, useContext } from 'react'; // Додав useContext
+
+import React, { createContext, useState, useMemo, useContext } from 'react'; 
 import { ThemeProvider as StyledThemeProvider } from 'styled-components/native';
 import { darkTheme } from '../themes/darkTheme';
 import { lightTheme } from '../themes/lightTheme';
