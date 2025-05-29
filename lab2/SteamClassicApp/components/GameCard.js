@@ -1,8 +1,8 @@
-// components/GameCard.js
+
 import React from 'react';
-import { View, TouchableOpacity } from 'react-native'; // TouchableOpacity для клікабельності
+import { View, TouchableOpacity } from 'react-native'; 
 import styled from 'styled-components/native';
-// import { useAppTheme } from '../contexts/ThemeContext'; // Якщо потрібен доступ до теми напряму
+
 
 const CardContainer = styled(TouchableOpacity)`
   background-color: ${props => props.theme.cardBackground};
