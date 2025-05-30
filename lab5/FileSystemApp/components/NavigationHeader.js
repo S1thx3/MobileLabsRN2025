@@ -19,7 +19,7 @@ const NavigationHeader = ({ currentPath, onNavigateUp, onShowCreateOptionsModal 
         <Text style={styles.currentPathText} numberOfLines={1} ellipsizeMode="head">{getDisplayPath(currentPath)}</Text>
       </ScrollView>
       <TouchableOpacity
-        onPress={onShowCreateOptionsModal} // Змінено тут
+        onPress={onShowCreateOptionsModal} 
         style={styles.navButton}
       >
         <Ionicons name="create-outline" size={24} color="#007AFF" />

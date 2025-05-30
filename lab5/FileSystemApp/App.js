@@ -3,19 +3,19 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { StyleSheet, View, FlatList, Text, Alert } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 
-// ... (інші імпорти залишаються без змін)
+
 import { APP_DATA_DIRECTORY } from './utils/formatters';
 import CreateFolderModal from './components/CreateFolderModal';
 import CreateFileModal from './components/CreateFileModal';
 import CreateChoiceModal from './components/CreateChoiceModal';
 import EditFileModal from './components/EditFileModal';
+import FileInfoModal from './components/FileInfoModal'; 
 import FileListItem from './components/FileListItem';
 import StorageInfo from './components/StorageInfo';
 import NavigationHeader from './components/NavigationHeader';
 
 
 export default function App() {
-  // ... (всі стани залишаються без змін)
   const [totalStorage, setTotalStorage] = useState(0);
   const [freeStorage, setFreeStorage] = useState(0);
   const [usedStorage, setUsedStorage] = useState(0);
@@ -30,8 +30,11 @@ export default function App() {
   const [isEditFileModalVisible, setEditFileModalVisible] = useState(false);
   const [editingFile, setEditingFile] = useState(null);
 
+  const [isFileInfoModalVisible, setFileInfoModalVisible] = useState(false);
+  const [selectedItemForInfo, setSelectedItemForInfo] = useState(null);
 
-  // ... (getStorageInfo, ensureAppDataDirectoryExists, loadDirectoryContents залишаються без змін)
+
+
   const getStorageInfo = useCallback(async () => {
     try {
       const total = await FileSystem.getTotalDiskCapacityAsync();
@@ -61,13 +64,13 @@ export default function App() {
       const itemsWithDetails = await Promise.all(
         items.map(async (item) => {
           const itemPath = path + item;
-          const info = await FileSystem.getInfoAsync(itemPath);
+          const info = await FileSystem.getInfoAsync(itemPath, { size: true }); // Ensure size is requested
           return {
             name: item,
             isDirectory: info.isDirectory,
             uri: info.uri,
-            size: info.size,
-            modificationTime: info.modificationTime,
+            size: info.size, // Розмір файлу в байтах
+            modificationTime: info.modificationTime, // Час останньої модифікації (timestamp)
           };
         })
       );
@@ -97,7 +100,6 @@ export default function App() {
   }, [currentPath, ensureAppDataDirectoryExists, getStorageInfo, loadDirectoryContents]);
 
   const handleItemPress = (item) => {
-    // ... (код залишається тим самим)
     if (item.isDirectory) {
       setCurrentPath(item.uri + '/');
     } else {
@@ -105,13 +107,14 @@ export default function App() {
         setEditingFile({ uri: item.uri, name: item.name });
         setEditFileModalVisible(true);
       } else {
-        Alert.alert("Файл", `Тип файлу '${item.name.split('.').pop()}' не підтримується для перегляду/редагування.`);
+        // Якщо не .txt, можна просто показувати інформацію про файл
+        setSelectedItemForInfo(item);
+        setFileInfoModalVisible(true);
       }
     }
   };
 
   const navigateUp = () => {
-    // ... (код залишається тим самим)
     if (currentPath === APP_DATA_DIRECTORY) {
       return;
     }
@@ -120,28 +123,24 @@ export default function App() {
   };
   
   const handleFolderCreated = (folderName) => {
-    // ... (код залишається тим самим)
     setCreateFolderModalVisible(false);
     loadDirectoryContents(currentPath);
     Alert.alert("Успіх", `Папку "${folderName}" створено.`);
   };
 
   const handleFileCreated = (fileName) => {
-    // ... (код залишається тим самим)
     setCreateFileModalVisible(false);
     loadDirectoryContents(currentPath);
     Alert.alert("Успіх", `Файл "${fileName}" створено.`);
   };
 
   const handleFileSaved = (fileName) => {
-    // ... (код залишається тим самим)
     setEditFileModalVisible(false);
     setEditingFile(null);
     loadDirectoryContents(currentPath); 
     Alert.alert("Успіх", `Файл "${fileName}" збережено.`);
   };
 
-  // Нова функція для видалення
   const handleDeleteItem = (item) => {
     Alert.alert(
       "Підтвердження видалення",
@@ -154,7 +153,7 @@ export default function App() {
             try {
               await FileSystem.deleteAsync(item.uri, { idempotent: true });
               Alert.alert("Успіх", `"${item.name}" успішно видалено.`);
-              loadDirectoryContents(currentPath); // Оновлюємо список
+              loadDirectoryContents(currentPath); 
             } catch (error) {
               console.error("Error deleting item:", error);
               Alert.alert("Помилка", `Не вдалося видалити "${item.name}".`);
@@ -166,7 +165,16 @@ export default function App() {
     );
   };
 
-  // ... (openCreateChoiceModal, closeCreateChoiceModal, openCreateFolderModal, openCreateFileModal залишаються без змін)
+  const showItemInfo = (item) => {
+    setSelectedItemForInfo(item);
+    setFileInfoModalVisible(true);
+  };
+
+  const closeItemInfoModal = () => {
+    setFileInfoModalVisible(false);
+    setSelectedItemForInfo(null);
+  };
+  
   const openCreateChoiceModal = () => setCreateChoiceModalVisible(true);
   const closeCreateChoiceModal = () => setCreateChoiceModalVisible(false);
 
@@ -179,9 +187,10 @@ export default function App() {
     setCreateFileModalVisible(true);
   };
 
+
   return (
     <View style={styles.container}>
-      {/* ... (модальні вікна залишаються без змін) ... */}
+      {/* ... (існуючі модальні вікна) ... */}
       <CreateChoiceModal
         visible={isCreateChoiceModalVisible}
         onClose={closeCreateChoiceModal}
@@ -212,6 +221,13 @@ export default function App() {
             onFileSaved={handleFileSaved}
         />
       )}
+      {/* Додаємо нове модальне вікно інформації */}
+      <FileInfoModal
+        visible={isFileInfoModalVisible}
+        item={selectedItemForInfo}
+        onClose={closeItemInfoModal}
+      />
+
 
       <View style={styles.headerBar}>
         <Text style={styles.headerTitle}>Файловий менеджер</Text>
@@ -231,7 +247,8 @@ export default function App() {
           <FileListItem 
             item={item} 
             onPress={handleItemPress}
-            onDelete={handleDeleteItem} // Передаємо функцію видалення
+            onDelete={handleDeleteItem}
+            onShowInfo={showItemInfo} // Передаємо функцію показу інформації
           />
         )}
         keyExtractor={(item) => currentPath + item.name}
@@ -243,7 +260,6 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  // ... (стилі залишаються тими самими)
   container: {
     flex: 1,
     backgroundColor: '#f0f0f0',

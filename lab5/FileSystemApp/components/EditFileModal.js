@@ -30,7 +30,6 @@ const EditFileModal = ({ visible, fileUri, fileName, onClose, onFileSaved }) => 
     if (visible) {
       loadFileContent();
     } else {
-      // Скидання стану при закритті, щоб уникнути показу старого вмісту на мить
       setOriginalContent('');
       setEditedContent('');
       setError('');
@@ -52,7 +51,6 @@ const EditFileModal = ({ visible, fileUri, fileName, onClose, onFileSaved }) => 
   };
 
   const handleClose = () => {
-    // Якщо є незбережені зміни, запитати підтвердження
     if (originalContent !== editedContent) {
       Alert.alert(
         "Незбережені зміни",

@@ -1,10 +1,10 @@
-
+// components/FileListItem.js
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { MaterialIcons, Ionicons } from '@expo/vector-icons'; // Додаємо Ionicons
+import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { formatBytes } from '../utils/formatters';
 
-const FileListItem = ({ item, onPress, onDelete }) => { // Додаємо onDelete як пропс
+const FileListItem = ({ item, onPress, onDelete, onShowInfo }) => { // Додаємо onShowInfo
   return (
     <TouchableOpacity style={styles.itemContainer} onPress={() => onPress(item)}>
       <MaterialIcons
@@ -21,7 +21,10 @@ const FileListItem = ({ item, onPress, onDelete }) => { // Додаємо onDele
           <Text style={styles.itemType}>Файл ({formatBytes(item.size)})</Text>
         )}
       </View>
-      <TouchableOpacity onPress={() => onDelete(item)} style={styles.deleteButton}>
+      <TouchableOpacity onPress={() => onShowInfo(item)} style={styles.actionButton}>
+        <Ionicons name="information-circle-outline" size={26} color="#007AFF" />
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => onDelete(item)} style={styles.actionButton}>
         <Ionicons name="trash-outline" size={24} color="#FF3B30" />
       </TouchableOpacity>
     </TouchableOpacity>
@@ -41,7 +44,7 @@ const styles = StyleSheet.create({
     marginRight: 15,
   },
   itemTextContainer: {
-    flex: 1, // Щоб текстовий контейнер займав доступний простір
+    flex: 1,
   },
   itemName: {
     fontSize: 16,
@@ -51,9 +54,9 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#777',
   },
-  deleteButton: {
-    paddingLeft: 10, // Відступ для кнопки видалення
-    paddingVertical: 5, // Для легшого натискання
+  actionButton: { 
+    paddingLeft: 10,
+    paddingVertical: 5,
   }
 });
 
