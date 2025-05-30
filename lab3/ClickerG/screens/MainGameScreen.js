@@ -1,35 +1,72 @@
 // screens/MainGameScreen.js
 import React, { useRef } from 'react';
 import { View, Text, StyleSheet, Dimensions, Platform, Alert } from 'react-native';
-import { TapGestureHandler, LongPressGestureHandler, PanGestureHandler, State } from 'react-native-gesture-handler';
-// Animated та reanimated компоненти для майбутніх жестів (Pan, Pinch)
-import Animated, { useSharedValue, useAnimatedStyle, runOnJS, useAnimatedGestureHandler, withDecay } from 'react-native-reanimated';
+import {
+  TapGestureHandler,
+  LongPressGestureHandler,
+  PanGestureHandler,
+  State, // Важливо для перевірки стану жесту
+} from 'react-native-gesture-handler';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  useAnimatedGestureHandler,
+  runOnJS, // Для виклику JS функцій з UI потоку
+} from 'react-native-reanimated';
 import { useGame } from '../contexts/GameContext'; // Наш хук для доступу до стану гри
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 const OBJECT_SIZE = 100; // Розмір нашого інтерактивного об'єкта
 
-// screens/MainGameScreen.js
-// ... (імпорти та константи OBJECT_SIZE, SCREEN_WIDTH) ...
-
 const MainGameScreen = () => {
   const { score, addScore, updateTaskProgress } = useGame();
 
+  // Початкова позиція об'єкта
   const initialX = (SCREEN_WIDTH - OBJECT_SIZE) / 2;
-  const initialY = 150;
+  const initialY = 150; // Відступ від лічильника, щоб об'єкт був видний
 
+  // Shared values для анімованої позиції
   const translateX = useSharedValue(initialX);
   const translateY = useSharedValue(initialY);
-  const prevTranslateX = useSharedValue(initialX); // Для збереження попередньої позиції
-  const prevTranslateY = useSharedValue(initialY); // Для збереження попередньої позиції
 
+  // Shared values для збереження позиції перед початком перетягування (для контексту PanGestureHandler)
+  // Ці prevTranslateX/Y зараз не використовуються в логіці onPanGestureEvent,
+  // оскільки context.startX/Y робить те саме, але їх можна залишити для майбутнього.
+  // const prevTranslateX = useSharedValue(initialX);
+  // const prevTranslateY = useSharedValue(initialY);
 
+  // Посилання для розрізнення одинарного та подвійного тапу
   const doubleTapRef = useRef(null);
 
-  const onSingleTap = (event) => { /* ... (без змін) ... */ };
-  const onDoubleTap = (event) => { /* ... (без змін) ... */ };
-  const onLongPress = (event) => { /* ... (без змін) ... */ };
+  // Обробник ОДИНАРНОГО тапу
+  const onSingleTap = (event) => {
+    if (event.nativeEvent.state === State.ACTIVE) {
+      console.log('Single Tap Activated!');
+      runOnJS(addScore)(1); // Додаємо 1 очко
+      runOnJS(updateTaskProgress)('singleTap');
+    }
+  };
+
+  // Обробник ПОДВІЙНОГО тапу
+  const onDoubleTap = (event) => {
+    if (event.nativeEvent.state === State.ACTIVE) {
+      console.log('Double Tap Activated!');
+      runOnJS(addScore)(2); // Додаємо 2 очки (або іншу кількість за завданням)
+      runOnJS(updateTaskProgress)('doubleTap');
+    }
+  };
+
+  // Обробник ДОВГОГО НАТИСКАННЯ
+  const onLongPress = (event) => {
+    if (event.nativeEvent.state === State.ACTIVE) {
+      console.log('Long Press Activated!');
+      const bonusPoints = 10; // Наприклад, 10 бонусних очок
+      runOnJS(addScore)(bonusPoints);
+      runOnJS(updateTaskProgress)('longPress');
+      runOnJS(Alert.alert)('Бонус!', `Ви отримали ${bonusPoints} бонусних очок за утримання!`);
+    }
+  };
 
   // Обробник для PanGestureHandler (перетягування)
   const onPanGestureEvent = useAnimatedGestureHandler({
@@ -37,8 +74,6 @@ const MainGameScreen = () => {
       // Зберігаємо початкову позицію об'єкта при старті перетягування
       context.startX = translateX.value;
       context.startY = translateY.value;
-      // Позначимо, що завдання "Перетягнути об'єкт" виконано (якщо ще не виконано)
-      // Це краще робити в onEnd або onActive, щоб зафіксувати сам факт перетягування
     },
     onActive: (event, context) => {
       // Оновлюємо позицію об'єкта на основі зміщення від початкової точки
@@ -50,9 +85,11 @@ const MainGameScreen = () => {
       if (translateY.value < 0) {
         translateY.value = 0;
       }
-      // Нижній край (враховуємо висоту статус-бару та таб-бару, якщо потрібно точніше)
-      if (translateY.value > SCREEN_HEIGHT - OBJECT_SIZE - 100) { // -100 приблизно для таб-бару та хедера
-         translateY.value = SCREEN_HEIGHT - OBJECT_SIZE - 100;
+      // Нижній край (враховуємо висоту, наприклад, для таб-бару та хедера)
+      // Ці значення можуть потребувати підгонки
+      const bottomBoundary = SCREEN_HEIGHT - OBJECT_SIZE - (Platform.OS === 'ios' ? 90 : 70); // Приблизна висота таб-бару + невеликий відступ
+      if (translateY.value > bottomBoundary) {
+         translateY.value = bottomBoundary;
       }
       // Лівий край
       if (translateX.value < 0) {
@@ -64,21 +101,20 @@ const MainGameScreen = () => {
       }
     },
     onEnd: () => {
-      // Після завершення перетягування, можна оновити прогрес завдання
+      // Після завершення перетягування, оновлюємо прогрес завдання
       runOnJS(updateTaskProgress)('pan');
       console.log('Pan Gesture Ended');
-      // Зберігаємо нову "базову" позицію
-      prevTranslateX.value = translateX.value;
-      prevTranslateY.value = translateY.value;
+      // Немає потреби оновлювати prevTranslateX/Y тут, якщо onStart завжди бере поточні translateX/Y.value
     },
   });
 
+  // Анімований стиль для об'єкта (позиція)
   const animatedObjectStyle = useAnimatedStyle(() => {
     return {
       transform: [
         { translateX: translateX.value },
         { translateY: translateY.value },
-        // { scale: scale.value }, // Поки закоментовано
+        // { scale: scale.value }, // Розкоментуємо для PinchGesture
       ],
     };
   });
@@ -87,12 +123,15 @@ const MainGameScreen = () => {
     <View style={styles.container}>
       <Text style={styles.scoreText}>Очки: {score}</Text>
 
-      {/* PanGestureHandler обгортає все, що ми хочемо зробити перетягуваним */}
-      <PanGestureHandler onGestureEvent={onPanGestureEvent}>
-        <Animated.View> {/* Додаткова Animated.View для PanGestureHandler */}
+      <PanGestureHandler
+        onGestureEvent={onPanGestureEvent}
+        activeOffsetX={[-10, 10]} // Дозволяє тапам спрацьовувати, якщо рух по X незначний
+        activeOffsetY={[-10, 10]} // Дозволяє тапам спрацьовувати, якщо рух по Y незначний
+      >
+        <Animated.View> {/* Цей View потрібен для PanGestureHandler, щоб він мав на що діяти */}
           <LongPressGestureHandler
             onHandlerStateChange={onLongPress}
-            minDurationMs={3000}
+            minDurationMs={3000} // 3 секунди
           >
             <TapGestureHandler
               ref={doubleTapRef}
@@ -104,6 +143,7 @@ const MainGameScreen = () => {
                 onHandlerStateChange={onSingleTap}
                 numberOfTaps={1}
               >
+                {/* Інтерактивний об'єкт */}
                 <Animated.View style={[styles.interactiveObject, animatedObjectStyle]}>
                   <Text style={styles.objectText}>Drag Me!</Text>
                 </Animated.View>
@@ -116,30 +156,29 @@ const MainGameScreen = () => {
   );
 };
 
-// ... (стилі залишаються ті самі, але оновимо container та interactiveObject) ...
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // alignItems: 'center', // Забираємо, щоб scoreText був зверху, а об'єкт міг рухатись вільно
-    paddingTop: Platform.OS === 'android' ? 25 : 50,
-    backgroundColor: '#f0f8ff',
+    // alignItems: 'center', // Закоментовано, щоб scoreText був по центру, а об'єкт вільно рухався
+    paddingTop: Platform.OS === 'android' ? 30 : 50, // Збільшив відступ для iOS
+    backgroundColor: '#f0f8ff', // AliceBlue для фону
   },
   scoreText: {
     fontSize: 32,
     fontWeight: 'bold',
     color: '#333',
-    alignSelf: 'center', // Центруємо текст очків
-    marginBottom: 20,   // Зменшимо відступ, бо об'єкт тепер позиціонується абсолютно
+    textAlign: 'center', // Щоб текст очок був по центру
+    marginBottom: 20,
   },
   interactiveObject: {
     width: OBJECT_SIZE,
     height: OBJECT_SIZE,
-    backgroundColor: 'deepskyblue', // Змінимо колір для наочності
+    backgroundColor: 'deepskyblue', // Змінив колір
     borderRadius: OBJECT_SIZE / 2,
     justifyContent: 'center',
     alignItems: 'center',
-    position: 'absolute', // Важливо для позиціонування через transform
-    // Початкова позиція тепер задається через translateX.value та translateY.value
+    position: 'absolute', // Дуже важливо для позиціонування через transform
+    // Початкова позиція встановлюється через useSharedValue для translateX/Y
   },
   objectText: {
     color: 'white',
