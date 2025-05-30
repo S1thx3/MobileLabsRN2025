@@ -8,11 +8,11 @@ import AppNavigator from './navigation/AppNavigator';
 
 export default function App() {
   return (
-    <SafeAreaProvider>
+    <SafeAreaProvider> 
       <StatusBar style="auto" />
       <NavigationContainer>
         <AppNavigator />
       </NavigationContainer>
-    </SafeAreaProvider>
+    </SafeAreaProvider> 
   );
 }

@@ -4,8 +4,7 @@ module.exports = function(api) {
   return {
     presets: ['babel-preset-expo'],
     plugins: [
-      // Додай сюди плагін для Reanimated, коли будеш готовий
-      // 'react-native-reanimated/plugin',
+      'react-native-reanimated/plugin',
     ],
   };
 };

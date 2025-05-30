@@ -21,14 +21,11 @@ const AppNavigator = () => {
           }
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: 'tomato', // Тимчасові кольори
-        tabBarInactiveTintColor: 'gray', // Тимчасові кольори
-        headerStyle: { // Тимчасові стилі хедера
-          backgroundColor: '#f0f0f0',
-        },
-        headerTitleStyle: {
-          color: '#333',
-        }
+        tabBarActiveTintColor: 'dodgerblue', // Тимчасові кольори
+        tabBarInactiveTintColor: 'gray',    // Тимчасові кольори
+        // Можна додати стилі для хедера, якщо потрібно
+        // headerStyle: { backgroundColor: '#eee' },
+        // headerTitleStyle: { color: '#333' },
       })}
     >
       <Tab.Screen name="Game" component={MainGameScreen} options={{ title: 'Гра-Клікер' }} />
