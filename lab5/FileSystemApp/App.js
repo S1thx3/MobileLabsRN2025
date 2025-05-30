@@ -1,18 +1,21 @@
-// App.js
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { StyleSheet, View, FlatList, Text, Alert } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 
+// ... (інші імпорти залишаються без змін)
 import { APP_DATA_DIRECTORY } from './utils/formatters';
 import CreateFolderModal from './components/CreateFolderModal';
 import CreateFileModal from './components/CreateFileModal';
 import CreateChoiceModal from './components/CreateChoiceModal';
-import EditFileModal from './components/EditFileModal'; // Імпортуємо новий компонент
+import EditFileModal from './components/EditFileModal';
 import FileListItem from './components/FileListItem';
 import StorageInfo from './components/StorageInfo';
 import NavigationHeader from './components/NavigationHeader';
 
+
 export default function App() {
+  // ... (всі стани залишаються без змін)
   const [totalStorage, setTotalStorage] = useState(0);
   const [freeStorage, setFreeStorage] = useState(0);
   const [usedStorage, setUsedStorage] = useState(0);
@@ -24,10 +27,11 @@ export default function App() {
   const [isCreateFolderModalVisible, setCreateFolderModalVisible] = useState(false);
   const [isCreateFileModalVisible, setCreateFileModalVisible] = useState(false);
   
-  // Нові стани для модального вікна редагування
   const [isEditFileModalVisible, setEditFileModalVisible] = useState(false);
-  const [editingFile, setEditingFile] = useState(null); // Буде об'єктом { uri, name }
+  const [editingFile, setEditingFile] = useState(null);
 
+
+  // ... (getStorageInfo, ensureAppDataDirectoryExists, loadDirectoryContents залишаються без змін)
   const getStorageInfo = useCallback(async () => {
     try {
       const total = await FileSystem.getTotalDiskCapacityAsync();
@@ -74,7 +78,7 @@ export default function App() {
         return a.isDirectory ? -1 : 1;
       }));
     } catch (error)
-      { // ... (код обробки помилок залишається тим самим)
+      { 
       console.error(`Error loading directory contents for ${path}:`, error);
       Alert.alert("Помилка", `Не вдалося завантажити вміст директорії.`);
       if (path !== APP_DATA_DIRECTORY) {
@@ -83,7 +87,7 @@ export default function App() {
         setDirectoryItems([]);
       }
     }
-  }, []); // Залежності useCallback для loadDirectoryContents залишаємо порожніми
+  }, []); 
 
   useEffect(() => {
     ensureAppDataDirectoryExists().then(() => {
@@ -93,10 +97,10 @@ export default function App() {
   }, [currentPath, ensureAppDataDirectoryExists, getStorageInfo, loadDirectoryContents]);
 
   const handleItemPress = (item) => {
+    // ... (код залишається тим самим)
     if (item.isDirectory) {
       setCurrentPath(item.uri + '/');
     } else {
-      // Перевіряємо, чи це .txt файл
       if (item.name.endsWith('.txt')) {
         setEditingFile({ uri: item.uri, name: item.name });
         setEditFileModalVisible(true);
@@ -130,12 +134,39 @@ export default function App() {
   };
 
   const handleFileSaved = (fileName) => {
+    // ... (код залишається тим самим)
     setEditFileModalVisible(false);
     setEditingFile(null);
-    loadDirectoryContents(currentPath); // Оновлюємо список, щоб побачити зміни розміру/дати
+    loadDirectoryContents(currentPath); 
     Alert.alert("Успіх", `Файл "${fileName}" збережено.`);
-  }
+  };
 
+  // Нова функція для видалення
+  const handleDeleteItem = (item) => {
+    Alert.alert(
+      "Підтвердження видалення",
+      `Ви впевнені, що хочете видалити "${item.name}"?${item.isDirectory ? "\n(УВАГА: Весь вміст папки також буде видалено!)" : ""}`,
+      [
+        { text: "Скасувати", style: "cancel" },
+        { 
+          text: "Видалити", 
+          onPress: async () => {
+            try {
+              await FileSystem.deleteAsync(item.uri, { idempotent: true });
+              Alert.alert("Успіх", `"${item.name}" успішно видалено.`);
+              loadDirectoryContents(currentPath); // Оновлюємо список
+            } catch (error) {
+              console.error("Error deleting item:", error);
+              Alert.alert("Помилка", `Не вдалося видалити "${item.name}".`);
+            }
+          },
+          style: "destructive" 
+        }
+      ]
+    );
+  };
+
+  // ... (openCreateChoiceModal, closeCreateChoiceModal, openCreateFolderModal, openCreateFileModal залишаються без змін)
   const openCreateChoiceModal = () => setCreateChoiceModalVisible(true);
   const closeCreateChoiceModal = () => setCreateChoiceModalVisible(false);
 
@@ -150,6 +181,7 @@ export default function App() {
 
   return (
     <View style={styles.container}>
+      {/* ... (модальні вікна залишаються без змін) ... */}
       <CreateChoiceModal
         visible={isCreateChoiceModalVisible}
         onClose={closeCreateChoiceModal}
@@ -168,7 +200,6 @@ export default function App() {
         onClose={() => setCreateFileModalVisible(false)}
         onFileCreated={handleFileCreated}
       />
-      {/* Додаємо нове модальне вікно */}
       {editingFile && (
         <EditFileModal
             visible={isEditFileModalVisible}
@@ -196,7 +227,13 @@ export default function App() {
 
       <FlatList
         data={directoryItems}
-        renderItem={({item}) => <FileListItem item={item} onPress={handleItemPress} />}
+        renderItem={({item}) => (
+          <FileListItem 
+            item={item} 
+            onPress={handleItemPress}
+            onDelete={handleDeleteItem} // Передаємо функцію видалення
+          />
+        )}
         keyExtractor={(item) => currentPath + item.name}
         style={styles.fileList}
         ListEmptyComponent={<Text style={styles.emptyListText}>Папка порожня</Text>}

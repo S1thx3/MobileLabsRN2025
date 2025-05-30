@@ -1,4 +1,4 @@
-// components/EditFileModal.js
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Modal, StyleSheet, Alert, ScrollView, ActivityIndicator } from 'react-native';
 import * as FileSystem from 'expo-file-system';
