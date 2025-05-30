@@ -1,4 +1,4 @@
-// utils/formatters.js
+
 import * as FileSystem from 'expo-file-system';
 
 export const APP_DATA_DIRECTORY_NAME = 'AppData';

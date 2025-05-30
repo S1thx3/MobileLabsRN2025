@@ -1,31 +1,38 @@
-
+// components/CreateFileModal.js
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Modal, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Modal, StyleSheet, Alert, ScrollView } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 
-const CreateFolderModal = ({ visible, currentPath, onClose, onFolderCreated }) => {
-  const [newFolderName, setNewFolderName] = useState('');
+const CreateFileModal = ({ visible, currentPath, onClose, onFileCreated }) => {
+  const [newFileName, setNewFileName] = useState('');
+  const [fileContent, setFileContent] = useState('');
 
   const handleCreate = async () => {
-    const trimmedName = newFolderName.trim();
+    let trimmedName = newFileName.trim();
     if (!trimmedName) {
-      Alert.alert("Помилка", "Назва папки не може бути порожньою.");
+      Alert.alert("Помилка", "Назва файлу не може бути порожньою.");
       return;
     }
+    if (!trimmedName.endsWith('.txt')) {
+      trimmedName += '.txt';
+    }
+
     try {
-      const folderPath = currentPath + trimmedName;
-      await FileSystem.makeDirectoryAsync(folderPath, { intermediates: true });
-      setNewFolderName('');
-      onFolderCreated(trimmedName); 
+      const filePath = currentPath + trimmedName;
+      await FileSystem.writeAsStringAsync(filePath, fileContent);
+      setNewFileName('');
+      setFileContent('');
+      onFileCreated(trimmedName);
     } catch (error) {
-      console.error("Error creating folder:", error);
-      Alert.alert("Помилка", `Не вдалося створити папку. ${error.message}`);
+      console.error("Error creating file:", error);
+      Alert.alert("Помилка", `Не вдалося створити файл. ${error.message}`);
       onClose();
     }
   };
 
   const handleClose = () => {
-    setNewFolderName('');
+    setNewFileName('');
+    setFileContent('');
     onClose();
   };
 
@@ -38,13 +45,21 @@ const CreateFolderModal = ({ visible, currentPath, onClose, onFolderCreated }) =
     >
       <View style={styles.modalCenteredView}>
         <View style={styles.modalView}>
-          <Text style={styles.modalText}>Створити нову папку</Text>
+          <Text style={styles.modalText}>Створити новий файл (.txt)</Text>
           <TextInput
             style={styles.input}
-            onChangeText={setNewFolderName}
-            value={newFolderName}
-            placeholder="Назва папки"
+            onChangeText={setNewFileName}
+            value={newFileName}
+            placeholder="Назва файлу (напр., notes.txt)"
             autoFocus={true}
+          />
+          <TextInput
+            style={[styles.input, styles.multilineInput]}
+            onChangeText={setFileContent}
+            value={fileContent}
+            placeholder="Вміст файлу..."
+            multiline={true}
+            numberOfLines={4}
           />
           <View style={styles.modalButtonsContainer}>
             <TouchableOpacity
@@ -77,14 +92,14 @@ const styles = StyleSheet.create({
     margin: 20,
     backgroundColor: "white",
     borderRadius: 20,
-    padding: 35,
+    padding: 25,
     alignItems: "center",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
-    width: '80%',
+    width: '90%',
   },
   modalText: {
     marginBottom: 15,
@@ -96,15 +111,20 @@ const styles = StyleSheet.create({
     height: 40,
     borderColor: 'gray',
     borderWidth: 1,
-    marginBottom: 20,
+    marginBottom: 15,
     paddingHorizontal: 10,
     width: '100%',
     borderRadius: 5,
+  },
+  multilineInput: {
+    height: 100,
+    textAlignVertical: 'top',
   },
   modalButtonsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
+    marginTop: 10,
   },
   modalButton: {
     borderRadius: 10,
@@ -127,4 +147,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default CreateFolderModal;
+export default CreateFileModal;

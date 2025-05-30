@@ -1,11 +1,11 @@
-// components/NavigationHeader.js
+
 import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import { AntDesign, Ionicons } from '@expo/vector-icons';
 import { APP_DATA_DIRECTORY, getDisplayPath } from '../utils/formatters';
 
 
-const NavigationHeader = ({ currentPath, onNavigateUp, onShowCreateFolderModal }) => {
+const NavigationHeader = ({ currentPath, onNavigateUp, onShowCreateOptionsModal }) => {
   return (
     <View style={styles.navigationHeader}>
       <TouchableOpacity
@@ -19,7 +19,7 @@ const NavigationHeader = ({ currentPath, onNavigateUp, onShowCreateFolderModal }
         <Text style={styles.currentPathText} numberOfLines={1} ellipsizeMode="head">{getDisplayPath(currentPath)}</Text>
       </ScrollView>
       <TouchableOpacity
-        onPress={onShowCreateFolderModal}
+        onPress={onShowCreateOptionsModal} // Змінено тут
         style={styles.navButton}
       >
         <Ionicons name="create-outline" size={24} color="#007AFF" />
@@ -48,14 +48,14 @@ const styles = StyleSheet.create({
     // opacity: 0.5,
   },
   pathContainerScrollView: {
-    flex: 1, // Allow it to take available space
-    marginHorizontal: 10, // Add some spacing
-    alignItems: 'center', // Vertically center the text if needed
+    flex: 1,
+    marginHorizontal: 10,
+    alignItems: 'center',
   },
   currentPathText: {
     fontSize: 14,
     color: '#555',
-    textAlign: 'left', // Ensure text aligns left
+    textAlign: 'left',
   },
 });
 

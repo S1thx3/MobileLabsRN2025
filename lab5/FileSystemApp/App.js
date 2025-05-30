@@ -5,6 +5,9 @@ import * as FileSystem from 'expo-file-system';
 
 import { APP_DATA_DIRECTORY } from './utils/formatters';
 import CreateFolderModal from './components/CreateFolderModal';
+import CreateFileModal from './components/CreateFileModal';
+import CreateChoiceModal from './components/CreateChoiceModal';
+import EditFileModal from './components/EditFileModal'; // Імпортуємо новий компонент
 import FileListItem from './components/FileListItem';
 import StorageInfo from './components/StorageInfo';
 import NavigationHeader from './components/NavigationHeader';
@@ -17,7 +20,13 @@ export default function App() {
   const [currentPath, setCurrentPath] = useState(APP_DATA_DIRECTORY);
   const [directoryItems, setDirectoryItems] = useState([]);
 
+  const [isCreateChoiceModalVisible, setCreateChoiceModalVisible] = useState(false);
   const [isCreateFolderModalVisible, setCreateFolderModalVisible] = useState(false);
+  const [isCreateFileModalVisible, setCreateFileModalVisible] = useState(false);
+  
+  // Нові стани для модального вікна редагування
+  const [isEditFileModalVisible, setEditFileModalVisible] = useState(false);
+  const [editingFile, setEditingFile] = useState(null); // Буде об'єктом { uri, name }
 
   const getStorageInfo = useCallback(async () => {
     try {
@@ -64,7 +73,8 @@ export default function App() {
         }
         return a.isDirectory ? -1 : 1;
       }));
-    } catch (error) {
+    } catch (error)
+      { // ... (код обробки помилок залишається тим самим)
       console.error(`Error loading directory contents for ${path}:`, error);
       Alert.alert("Помилка", `Не вдалося завантажити вміст директорії.`);
       if (path !== APP_DATA_DIRECTORY) {
@@ -73,7 +83,7 @@ export default function App() {
         setDirectoryItems([]);
       }
     }
-  }, []);
+  }, []); // Залежності useCallback для loadDirectoryContents залишаємо порожніми
 
   useEffect(() => {
     ensureAppDataDirectoryExists().then(() => {
@@ -86,11 +96,18 @@ export default function App() {
     if (item.isDirectory) {
       setCurrentPath(item.uri + '/');
     } else {
-      Alert.alert("Файл", `Ви обрали файл: ${item.name}. Функція перегляду буде додана.`);
+      // Перевіряємо, чи це .txt файл
+      if (item.name.endsWith('.txt')) {
+        setEditingFile({ uri: item.uri, name: item.name });
+        setEditFileModalVisible(true);
+      } else {
+        Alert.alert("Файл", `Тип файлу '${item.name.split('.').pop()}' не підтримується для перегляду/редагування.`);
+      }
     }
   };
 
   const navigateUp = () => {
+    // ... (код залишається тим самим)
     if (currentPath === APP_DATA_DIRECTORY) {
       return;
     }
@@ -99,19 +116,71 @@ export default function App() {
   };
   
   const handleFolderCreated = (folderName) => {
+    // ... (код залишається тим самим)
     setCreateFolderModalVisible(false);
     loadDirectoryContents(currentPath);
     Alert.alert("Успіх", `Папку "${folderName}" створено.`);
   };
 
+  const handleFileCreated = (fileName) => {
+    // ... (код залишається тим самим)
+    setCreateFileModalVisible(false);
+    loadDirectoryContents(currentPath);
+    Alert.alert("Успіх", `Файл "${fileName}" створено.`);
+  };
+
+  const handleFileSaved = (fileName) => {
+    setEditFileModalVisible(false);
+    setEditingFile(null);
+    loadDirectoryContents(currentPath); // Оновлюємо список, щоб побачити зміни розміру/дати
+    Alert.alert("Успіх", `Файл "${fileName}" збережено.`);
+  }
+
+  const openCreateChoiceModal = () => setCreateChoiceModalVisible(true);
+  const closeCreateChoiceModal = () => setCreateChoiceModalVisible(false);
+
+  const openCreateFolderModal = () => {
+    closeCreateChoiceModal();
+    setCreateFolderModalVisible(true);
+  };
+  const openCreateFileModal = () => {
+    closeCreateChoiceModal();
+    setCreateFileModalVisible(true);
+  };
+
   return (
     <View style={styles.container}>
+      <CreateChoiceModal
+        visible={isCreateChoiceModalVisible}
+        onClose={closeCreateChoiceModal}
+        onSelectFolder={openCreateFolderModal}
+        onSelectFile={openCreateFileModal}
+      />
       <CreateFolderModal
         visible={isCreateFolderModalVisible}
         currentPath={currentPath}
         onClose={() => setCreateFolderModalVisible(false)}
         onFolderCreated={handleFolderCreated}
       />
+      <CreateFileModal
+        visible={isCreateFileModalVisible}
+        currentPath={currentPath}
+        onClose={() => setCreateFileModalVisible(false)}
+        onFileCreated={handleFileCreated}
+      />
+      {/* Додаємо нове модальне вікно */}
+      {editingFile && (
+        <EditFileModal
+            visible={isEditFileModalVisible}
+            fileUri={editingFile.uri}
+            fileName={editingFile.name}
+            onClose={() => {
+                setEditFileModalVisible(false);
+                setEditingFile(null);
+            }}
+            onFileSaved={handleFileSaved}
+        />
+      )}
 
       <View style={styles.headerBar}>
         <Text style={styles.headerTitle}>Файловий менеджер</Text>
@@ -122,13 +191,13 @@ export default function App() {
       <NavigationHeader
         currentPath={currentPath}
         onNavigateUp={navigateUp}
-        onShowCreateFolderModal={() => setCreateFolderModalVisible(true)}
+        onShowCreateOptionsModal={openCreateChoiceModal}
       />
 
       <FlatList
         data={directoryItems}
         renderItem={({item}) => <FileListItem item={item} onPress={handleItemPress} />}
-        keyExtractor={(item) => item.uri}
+        keyExtractor={(item) => currentPath + item.name}
         style={styles.fileList}
         ListEmptyComponent={<Text style={styles.emptyListText}>Папка порожня</Text>}
       />
@@ -137,6 +206,7 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
+  // ... (стилі залишаються тими самими)
   container: {
     flex: 1,
     backgroundColor: '#f0f0f0',
